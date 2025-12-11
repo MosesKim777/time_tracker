@@ -20,6 +20,7 @@ handle(Payload) ->
         <<"message">> => ErrMsg
       });
     Class:Reason:Stacktrace ->
+      io:format("Class: ~p~n Reason: ~p~n Stacktrace: ~p~n", [Class, Reason, Stacktrace]),
       jsx:encode(#{
         <<"status">> => <<"error">>,
         <<"error_type">> => <<"internal_error">>,

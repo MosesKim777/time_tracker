@@ -16,7 +16,7 @@ get_user_id_by_card(CardUid) ->
     {ok, _, [{UserId}]} ->
       {ok, UserId};
     {ok, _, []} ->
-      throw({<<"invalid_request">>, <<"No users by 'card_uid' = ", (integer_to_binary(CardUid))/binary>>});
+      throw({<<"invalid_request">>, <<"No users by 'card_uid' = ", (CardUid)/binary>>});
     {error, Reason} ->
       throw({<<"db_error">>, tt_utils:val_to_binary(Reason)})
   end.
@@ -45,7 +45,7 @@ delete(CardUid) ->
     {ok, _, [{UserId}]} ->
       {ok, UserId};
     {ok, _, []} ->
-      throw({<<"invalid_request">>, <<"There is no card with 'card_uid' = ", (integer_to_binary(CardUid))/binary>>});
+      throw({<<"invalid_request">>, <<"There is no card with 'card_uid' = ", (CardUid)/binary>>});
     {error, Reason} ->
       throw({<<"db_error">>, tt_utils:val_to_binary(Reason)})
   end.
@@ -66,10 +66,10 @@ list_card_by_user(UserId) ->
 delete_all_by_user(UserId) ->
   Sql = "DELETE FROM cards WHERE user_id = $1 RETURNING card_uid",
   case make_request(Sql, [UserId]) of
-    {ok, _, []} ->
+    {ok, _, _, []} ->
       throw({<<"invalid_request">>, <<"No card by 'user_id' = ",
         (integer_to_binary(UserId))/binary>>});
-    {ok, _, Rows} ->
+    {ok, _, _, Rows} ->
       CardUids = [CardUid || {CardUid} <- Rows],
       {ok, CardUids};
     {error, Reason} ->
