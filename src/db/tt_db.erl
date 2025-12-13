@@ -8,19 +8,20 @@
   delete/1,
   list_card_by_user/1,
   delete_all_by_user/1,
-  %% Work Schedule functions
   set_work_schedule/4,
   get_work_schedule/1,
-  %% Exclusion functions
   add_exclusion/4,
   get_exclusions/1,
   get_exclusions_by_period/3,
-  %% History functions
   get_history_by_user/1,
   get_history_by_period/3,
   get_schedule_with_exclusions/3,
   get_first_touch_date/1
 ]).
+
+%%%===================================================================
+%%% API
+%%%===================================================================
 
 get_user_id_by_card(CardUid) ->
   Sql = "SELECT user_id FROM cards WHERE card_uid = $1",
@@ -88,10 +89,6 @@ delete_all_by_user(UserId) ->
       throw({<<"db_error">>, tt_utils:val_to_binary(Reason)})
   end.
 
-%%%===================================================================
-%%% Work Schedule functions
-%%%===================================================================
-
 set_work_schedule(UserId, StartTime, EndTime, Days) ->
   DeleteSql = "DELETE FROM work_schedules WHERE user_id = $1",
   InsertSql = "INSERT INTO work_schedules (user_id, start_time, end_time, days) VALUES ($1, $2::time, $3::time, $4)",
@@ -117,11 +114,6 @@ get_work_schedule(UserId) ->
     {error, Reason} ->
       throw({<<"db_error">>, tt_utils:val_to_binary(Reason)})
   end.
-
-
-%%%===================================================================
-%%% Exclusion functions
-%%%===================================================================
 
 add_exclusion(UserId, TypeExclusion, StartDateTime, EndDateTime) ->
   Sql = "INSERT INTO schedule_exclusions (user_id, type_exclusion, start_datetime, end_datetime) VALUES ($1, $2, $3::timestamp, $4::timestamp)",
@@ -149,10 +141,6 @@ get_exclusions_by_period(UserId, StartDate, EndDate) ->
     {error, Reason} ->
       throw({<<"db_error">>, tt_utils:val_to_binary(Reason)})
   end.
-
-%%%===================================================================
-%%% History functions
-%%%===================================================================
 
 get_history_by_user(UserId) ->
   Sql = "SELECT touch_time FROM work_history WHERE user_id = $1 ORDER BY touch_time DESC",
@@ -202,6 +190,10 @@ get_first_touch_date(UserId) ->
     {error, Reason} ->
       throw({<<"db_error">>, tt_utils:val_to_binary(Reason)})
   end.
+
+%%%===================================================================
+%%% Internal functions
+%%%===================================================================
 
 make_request(Sql, Args) ->
   {ok, Connection} = tt_db_worker:get_connection(),

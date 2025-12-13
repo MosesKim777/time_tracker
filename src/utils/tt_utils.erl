@@ -24,10 +24,6 @@ build_ok_response(Response) ->
     <<"data">> => Response
   }.
 
-%%%===================================================================
-%%% Time and Date utilities
-%%%===================================================================
-
 parse_time(TimeStr) when is_binary(TimeStr) ->
   parse_time(binary_to_list(TimeStr));
 parse_time(TimeStr) when is_list(TimeStr) ->

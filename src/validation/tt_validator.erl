@@ -2,6 +2,7 @@
 
 -include("time_tracker.hrl").
 
+
 -export([validate/2]).
 
 -define(SCHEMA_CARD_UID, #{
@@ -12,6 +13,10 @@
   <<"user_id">> => [required, is_integer]
   }).
 
+%%%===================================================================
+%%% API
+%%%===================================================================
+
 validate(Method, Data) ->
   Schema = get_schema(Method),
   case liver:validate(Schema, Data) of
@@ -20,6 +25,10 @@ validate(Method, Data) ->
     {error, Reason} ->
       throw({<<"invalid_request">>, Reason})
   end.
+
+%%%===================================================================
+%%% Internal functions
+%%%===================================================================
 
 get_schema(<<"/card/touch">>) ->
   ?SCHEMA_CARD_UID;

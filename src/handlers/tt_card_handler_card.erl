@@ -9,6 +9,10 @@
   delete_all_by_user/1
 ]).
 
+%%%===================================================================
+%%% API
+%%%===================================================================
+
 touch(Data) ->
   CardUid = maps:get(<<"card_uid">>, Data),
   {ok, UserId} = tt_db:get_user_id_by_card(CardUid),

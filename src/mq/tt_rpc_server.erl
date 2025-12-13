@@ -66,6 +66,10 @@ terminate(_Reason, State) ->
 code_change(_OldVsn, State, _Extra) ->
   {ok, State}.
 
+%%%===================================================================
+%%% Internal functions
+%%%===================================================================
+
 create_and_subscribe_queue(Channel) ->
   case create_queue(Channel) of
     ok ->
@@ -111,4 +115,3 @@ cleanup_queue(Channel) ->
     if_empty = false
   },
   amqp_channel:call(Channel, Delete).
-
