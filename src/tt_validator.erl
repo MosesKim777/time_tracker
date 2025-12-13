@@ -61,7 +61,10 @@ get_schema(<<"/work_time/history_by_user">>) ->
 get_schema(<<"/work_time/statistics_by_user">>) ->
   #{
     <<"user_id">> => [required, is_integer],
-    <<"period">> => [{one_of, [[<<"week">>, <<"month">>, <<"year">>, <<"all">>]]}, default, <<"month">>]
+    <<"period">> => [
+      {default, <<"month">>},
+      {one_of, [<<"week">>, <<"month">>, <<"year">>, <<"all">>]}
+    ]
   };
 get_schema(Method) ->
   throw({<<"invalid_request">>, <<"Method '", (Method)/binary, "' is undefined">>}).
