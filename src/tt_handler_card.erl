@@ -18,13 +18,13 @@ touch(Data) ->
     <<"card_id">> => CardUid,
     <<"user_id">> => UserId
   },
-  build_ok_response(Response).
+  tt_utils:build_ok_response(Response).
 
 assign(Data) ->
   CardUid = maps:get(<<"card_uid">>, Data),
   UserId = maps:get(<<"user_id">>, Data),
   ok = tt_db:assign(CardUid, UserId),
-  build_ok_response(<<>>).
+  tt_utils:build_ok_response(<<>>).
 
 delete(Data) ->
   CardUid = maps:get(<<"card_uid">>, Data),
@@ -33,7 +33,7 @@ delete(Data) ->
     <<"card_id">> => CardUid,
     <<"user_id">> => UserId
   },
-  build_ok_response(Response).
+  tt_utils:build_ok_response(Response).
 
 list_by_user(Data) ->
   UserId = maps:get(<<"user_id">>, Data),
@@ -42,7 +42,7 @@ list_by_user(Data) ->
     <<"user_id">> => UserId,
     <<"cards">> => CardUids
   },
-  build_ok_response(Response).
+  tt_utils:build_ok_response(Response).
 
 delete_all_by_user(Data) ->
   UserId = maps:get(<<"user_id">>, Data),
@@ -51,10 +51,4 @@ delete_all_by_user(Data) ->
     <<"user_id">> => UserId,
     <<"cards">> => CardUids
   },
-  build_ok_response(Response).
-
-build_ok_response(Response) ->
-  #{
-    <<"status">> => <<"ok">>,
-    <<"data">> => Response
-  }.
+  tt_utils:build_ok_response(Response).

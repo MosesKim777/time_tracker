@@ -1,5 +1,7 @@
 -module(tt_validator).
 
+-include("time_tracker.hrl").
+
 -export([validate/2]).
 
 -define(SCHEMA_CARD_UID, #{
@@ -37,7 +39,11 @@ get_schema(<<"/work_time/set">>) ->
     <<"user_id">> => [required, is_integer],
     <<"start_time">> => [required, is_bstring],
     <<"end_time">> => [required, is_bstring],
-    <<"days">> => [required, {list_of, is_integer}]
+    <<"days">> =>  [required,
+      {list_of, [
+        {one_of, ?WEEK_DAYS}
+      ]}
+    ]
   };
 get_schema(<<"/work_time/get">>) ->
   ?SCHEMA_USER_ID;

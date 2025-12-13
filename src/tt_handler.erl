@@ -38,27 +38,27 @@ get_method(Request) ->
       Method
   end.
 
-route(<<"/card/touch">>, Body) ->
-  tt_handler_card:touch(Body);
-route(<<"/card/assign">>, Body) ->
-  tt_handler_card:assign(Body);
-route(<<"/card/delete">>, Body) ->
-  tt_handler_card:delete(Body);
-route(<<"/card/list_by_user">>, Body) ->
-  tt_handler_card:list_by_user(Body);
-route(<<"/card/delete_all_by_user">>, Body) ->
-  tt_handler_card:delete_all_by_user(Body);
-%%route(<<"/work_time/set">>, Body) ->
-%%  tt_handler:set_work_time(Body);
-%%route(<<"/work_time/get">>, Body) ->
-%%  tt_handler:get_work_time(Body);
-%%route(<<"/work_time/add_exclusion">>, Body) ->
-%%  tt_handler:add_exclusion(Body);
-%%route(<<"/work_time/get_exclusion">>, Body) ->
-%%  tt_handler:get_exclusion(Body);
-%%route(<<"/work_time/history_by_user">>, Body) ->
-%%  tt_handler:history_by_user(Body);
-%%route(<<"/work_time/statistics_by_user">>, Body) ->
-%%  tt_handler:statistics_by_user(Body);
-route(Method, _Body) ->
+route(<<"/card/touch">>, Request) ->
+  tt_handler_card:touch(Request);
+route(<<"/card/assign">>, Request) ->
+  tt_handler_card:assign(Request);
+route(<<"/card/delete">>, Request) ->
+  tt_handler_card:delete(Request);
+route(<<"/card/list_by_user">>, Request) ->
+  tt_handler_card:list_by_user(Request);
+route(<<"/card/delete_all_by_user">>, Request) ->
+  tt_handler_card:delete_all_by_user(Request);
+route(<<"/work_time/set">>, Request) ->
+  tt_handler_work_time:set_work_time(Request);
+route(<<"/work_time/get">>, Request) ->
+  tt_handler_work_time:get_work_time(Request);
+route(<<"/work_time/add_exclusion">>, Request) ->
+  tt_handler_work_time:add_exclusion(Request);
+route(<<"/work_time/get_exclusion">>, Request) ->
+  tt_handler_work_time:get_exclusion(Request);
+route(<<"/work_time/history_by_user">>, Request) ->
+  tt_handler_work_time:history_by_user(Request);
+route(<<"/work_time/statistics_by_user">>, Request) ->
+  tt_handler_work_time:statistics_by_user(Request);
+route(Method, _Request) ->
   throw({<<"invalid_request">>, <<"Method '", (Method)/binary, "' is undefined">>}).
