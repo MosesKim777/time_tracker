@@ -9,6 +9,7 @@
   format_date/1,
   format_datetime/1,
   time_diff_hours/2,
+  seconds_to_hms/1,
   get_period_dates/2,
   count_work_days/3,
   group_by_date/1
@@ -78,7 +79,7 @@ parse_date_time(DateStr, TimeStr) ->
   end.
 
 format_time({H, M, S}) ->
-  list_to_binary(io_lib:format("~2..0B:~2..0B:~2..0B", [H, M, trunc(S)])).
+  list_to_binary(io_lib:format("~B:~2..0B:~2..0B", [H, M, trunc(S)])).
 
 format_date({Y, M, D}) ->
   list_to_binary(io_lib:format("~4..0B-~2..0B-~2..0B", [Y, M, D])).
@@ -90,7 +91,14 @@ format_datetime({{Y, M, D}, {H, Min, S}}) ->
 time_diff_hours({H1, M1, S1}, {H2, M2, S2}) ->
   Seconds1 = H1 * 3600 + M1 * 60 + trunc(S1),
   Seconds2 = H2 * 3600 + M2 * 60 + trunc(S2),
-  (Seconds2 - Seconds1) / 3600.
+  Seconds2 - Seconds1.
+
+seconds_to_hms(TotalSeconds) ->
+  Hours = TotalSeconds div 3600,
+  Rem1  = TotalSeconds rem 3600,
+  Minutes = Rem1 div 60,
+  Seconds = Rem1 rem 60,
+  {Hours, Minutes, Seconds}.
 
 get_period_dates(<<"week">>, _) ->
   {{Y, M, D} = Date, _} = calendar:local_time(),

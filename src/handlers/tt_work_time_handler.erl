@@ -1,4 +1,4 @@
--module(tt_handler_work_time).
+-module(tt_work_time_handler).
 
 %% API
 -export([
@@ -119,17 +119,17 @@ calculate_statistics(History, Schedule, Exclusions, StartDate, EndDate) ->
   WorkedHours = calculate_worked_hours(History),
   UnderworkedHours = max(0, ExpectedHours - WorkedHours),
   
-  {LateCount, LateWithReason, EarlyCount, EarlyWithReason} = 
+  {LateWithoutReason, LateWithReason, EarlyWithoutReason, EarlyWithReason} =
     analyze_arrivals_departures(History, Schedule, Exclusions),
   
   #{
-    <<"expected_hours">> => ExpectedHours,
-    <<"worked_hours">> => WorkedHours,
-    <<"underworked_hours">> => UnderworkedHours,
+    <<"expected_hours">> => tt_utils:format_time(tt_utils:seconds_to_hms(ExpectedHours)),
+    <<"worked_hours">> => tt_utils:format_time(tt_utils:seconds_to_hms(WorkedHours)),
+    <<"underworked_hours">> => tt_utils:format_time(tt_utils:seconds_to_hms(UnderworkedHours)),
 
-    <<"late_count">> => LateCount,
+    <<"late_without_reason_count">> => LateWithoutReason,
     <<"late_with_reason_count">> => LateWithReason,
-    <<"early_count">> => EarlyCount,
+    <<"early_without_reason_count">> => EarlyWithoutReason,
     <<"early_with_reason_count">> => EarlyWithReason
   }.
 
@@ -172,8 +172,10 @@ calculate_time(Start, End) ->
 
 analyze_arrivals_departures(History,  {StartTime, EndTime, _}, Exclusions) ->
   {LateExl, EarlyExl} = count_exclusions_by_type(Exclusions),
-  {AllLate, AllEarlyExl}  = count_all_by_history(History, StartTime, EndTime),
-  {AllLate, LateExl, AllEarlyExl, EarlyExl}.
+  {AllLate, AllEarly}  = count_all_by_history(History, StartTime, EndTime),
+  Late = max(0, AllLate - LateExl),
+  Early = max(0, AllEarly - EarlyExl),
+  {Late, LateExl, Early, EarlyExl}.
 
 count_exclusions_by_type(Exclusions) ->
   lists:foldl(

@@ -1,4 +1,4 @@
--module(tt_handler_card).
+-module(tt_card_handler_card).
 
 %% API
 -export([
