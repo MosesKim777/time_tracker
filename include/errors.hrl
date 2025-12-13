@@ -1,0 +1,12 @@
+-define(INVALID_REQUEST_TYPE, <<"invalid_request">>).
+-define(INTERNAL_ERROR_TYPE, <<"internal_error">>).
+-define(DB_ERROR_TYPE, <<"db_error">>).
+
+-define(ERROR_METHOD_IS_REQUIRED, <<"Value 'method' is required in request">>).
+-define(ERROR_METHOD_IS_UNDEFINED(Method), <<"Method '", (Method)/binary, "' is undefined">>).
+-define(ERROR_METHOD_INVALID_TYPE, <<"Value 'method' must be string">>).
+-define(ERROR_NO_USERS_BY_CARD_UID(CardUid), <<"No users by 'card_uid' = ", (CardUid)/binary>>).
+-define(ERROR_NO_CARDS_BY_CARD_UID(CardUid), <<"There is no card with 'card_uid' = ", (CardUid)/binary>>).
+-define(ERROR_NO_CARDS_BY_USER_ID(UserId), <<"No cards by 'user_id' = ", (integer_to_binary(UserId))/binary>>).
+-define(ERROR_NO_SCHEDULE_BY_USER_ID(UserId), <<"No work schedule by user_id = ", (integer_to_binary(UserId))/binary>>).
+-define(ERROR_NO_HISTORY_BY_USER_ID(UserId), <<"No touch history for user_id = ", (integer_to_binary(UserId))/binary>>).

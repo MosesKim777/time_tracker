@@ -1,5 +1,7 @@
 -module(tt_handler).
 
+-include("errors.hrl").
+
 %% API
 -export([
   handle/1
@@ -27,7 +29,7 @@ handle(Payload) ->
       io:format("Class: ~p~n Reason: ~p~n Stacktrace: ~p~n", [Class, Reason, Stacktrace]),
       jsx:encode(#{
         <<"status">> => <<"error">>,
-        <<"error_type">> => <<"internal_error">>,
+        <<"error_type">> => ?INTERNAL_ERROR_TYPE,
         <<"message">> => list_to_binary(
           io_lib:format("~p:~p:~p", [Class, Reason, Stacktrace])
         )
@@ -41,9 +43,11 @@ handle(Payload) ->
 get_method(Request) ->
   case maps:get(<<"method">>, Request, undefined) of
     undefined ->
-      throw({<<"invalid_request">>, <<"Value 'method' is required in request">>});
-    Method ->
-      Method
+      throw({?INVALID_REQUEST_TYPE, ?ERROR_METHOD_IS_REQUIRED});
+    Method when is_binary(Method)->
+      Method;
+    _ ->
+      throw({?INVALID_REQUEST_TYPE, ?ERROR_METHOD_INVALID_TYPE})
   end.
 
 handle(<<"/card/touch">>, Request) ->
@@ -69,4 +73,4 @@ handle(<<"/work_time/history_by_user">>, Request) ->
 handle(<<"/work_time/statistics_by_user">>, Request) ->
   tt_work_time_handler:statistics_by_user(Request);
 handle(Method, _Request) ->
-  throw({<<"invalid_request">>, <<"Method '", (Method)/binary, "' is undefined">>}).
+  throw({?INVALID_REQUEST_TYPE, ?ERROR_METHOD_IS_UNDEFINED(Method)}).

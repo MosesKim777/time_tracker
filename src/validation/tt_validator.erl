@@ -1,6 +1,7 @@
 -module(tt_validator).
 
 -include("time_tracker.hrl").
+-include("errors.hrl").
 
 
 -export([validate/2]).
@@ -23,7 +24,7 @@ validate(Method, Data) ->
     {ok, ValidData} ->
       ValidData;
     {error, Reason} ->
-      throw({<<"invalid_request">>, Reason})
+      throw({?INVALID_REQUEST_TYPE, Reason})
   end.
 
 %%%===================================================================
@@ -76,4 +77,4 @@ get_schema(<<"/work_time/statistics_by_user">>) ->
     ]
   };
 get_schema(Method) ->
-  throw({<<"invalid_request">>, <<"Method '", (Method)/binary, "' is undefined">>}).
+  throw({?INVALID_REQUEST_TYPE, ?ERROR_METHOD_IS_UNDEFINED(Method)}).

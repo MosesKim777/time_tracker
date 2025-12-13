@@ -1,5 +1,7 @@
 -module(tt_db).
 
+-include("errors.hrl").
+
 %% API
 -export([
   get_user_id_by_card/1,
@@ -15,7 +17,6 @@
   get_exclusions_by_period/3,
   get_history_by_user/1,
   get_history_by_period/3,
-  get_schedule_with_exclusions/3,
   get_first_touch_date/1
 ]).
 
@@ -29,9 +30,9 @@ get_user_id_by_card(CardUid) ->
     {ok, _, [{UserId}]} ->
       {ok, UserId};
     {ok, _, []} ->
-      throw({<<"invalid_request">>, <<"No users by 'card_uid' = ", (CardUid)/binary>>});
+      throw({?INVALID_REQUEST_TYPE, ?ERROR_NO_USERS_BY_CARD_UID(CardUid)});
     {error, Reason} ->
-      throw({<<"db_error">>, tt_utils:val_to_binary(Reason)})
+      throw({?DB_ERROR_TYPE, tt_utils:val_to_binary(Reason)})
   end.
 
 set_touch(UserId, TouchTime) ->
@@ -40,7 +41,7 @@ set_touch(UserId, TouchTime) ->
     {ok, _} ->
       ok;
     {error, Reason} ->
-      throw({<<"db_error">>, tt_utils:val_to_binary(Reason)})
+      throw({?DB_ERROR_TYPE, tt_utils:val_to_binary(Reason)})
   end.
 
 assign(CardUid, UserId) ->
@@ -49,7 +50,7 @@ assign(CardUid, UserId) ->
     {ok, _} ->
       ok;
     {error, Reason} ->
-      throw({<<"db_error">>, tt_utils:val_to_binary(Reason)})
+      throw({?DB_ERROR_TYPE, tt_utils:val_to_binary(Reason)})
   end.
 
 delete(CardUid) ->
@@ -58,35 +59,33 @@ delete(CardUid) ->
     {ok, _, _, [{UserId}]} ->
       {ok, UserId};
     {ok, _, _, []} ->
-      throw({<<"invalid_request">>, <<"There is no card with 'card_uid' = ", (CardUid)/binary>>});
+      throw({?INVALID_REQUEST_TYPE, ?ERROR_NO_CARDS_BY_CARD_UID(CardUid)});
     {error, Reason} ->
-      throw({<<"db_error">>, tt_utils:val_to_binary(Reason)})
+      throw({?DB_ERROR_TYPE, tt_utils:val_to_binary(Reason)})
   end.
 
 list_card_by_user(UserId) ->
   Sql = "SELECT card_uid FROM cards WHERE user_id = $1",
   case make_request(Sql, [UserId]) of
     {ok, _, []} ->
-      throw({<<"invalid_request">>, <<"No card by 'user_id' = ",
-        (integer_to_binary(UserId))/binary>>});
+      throw({?INVALID_REQUEST_TYPE, ?ERROR_NO_CARDS_BY_USER_ID(UserId)});
     {ok, _, Rows} ->
       CardUids = [CardUid || {CardUid} <- Rows],
       {ok, CardUids};
     {error, Reason} ->
-      throw({<<"db_error">>, tt_utils:val_to_binary(Reason)})
+      throw({?DB_ERROR_TYPE, tt_utils:val_to_binary(Reason)})
   end.
 
 delete_all_by_user(UserId) ->
   Sql = "DELETE FROM cards WHERE user_id = $1 RETURNING card_uid",
   case make_request(Sql, [UserId]) of
     {ok, _, _, []} ->
-      throw({<<"invalid_request">>, <<"No card by 'user_id' = ",
-        (integer_to_binary(UserId))/binary>>});
+      throw({?INVALID_REQUEST_TYPE, ?ERROR_NO_CARDS_BY_USER_ID(UserId)});
     {ok, _, _, Rows} ->
       CardUids = [CardUid || {CardUid} <- Rows],
       {ok, CardUids};
     {error, Reason} ->
-      throw({<<"db_error">>, tt_utils:val_to_binary(Reason)})
+      throw({?DB_ERROR_TYPE, tt_utils:val_to_binary(Reason)})
   end.
 
 set_work_schedule(UserId, StartTime, EndTime, Days) ->
@@ -96,10 +95,10 @@ set_work_schedule(UserId, StartTime, EndTime, Days) ->
     {ok, _} ->
       case make_request(InsertSql, [UserId, StartTime, EndTime, Days]) of
         {ok, _} -> ok;
-        {error, Reason} -> throw({<<"db_error">>, tt_utils:val_to_binary(Reason)})
+        {error, Reason} -> throw({?DB_ERROR_TYPE, tt_utils:val_to_binary(Reason)})
       end;
     {error, Reason} ->
-      throw({<<"db_error">>, tt_utils:val_to_binary(Reason)})
+      throw({?DB_ERROR_TYPE, tt_utils:val_to_binary(Reason)})
   end.
 
 
@@ -107,12 +106,11 @@ get_work_schedule(UserId) ->
   Sql = "SELECT start_time, end_time, days FROM work_schedules WHERE user_id = $1",
   case make_request(Sql, [UserId]) of
     {ok, _, []} ->
-      throw({<<"invalid_request">>, <<"No work schedule for user_id = ", 
-        (integer_to_binary(UserId))/binary>>});
+      throw({?INVALID_REQUEST_TYPE, ?ERROR_NO_SCHEDULE_BY_USER_ID(UserId)});
     {ok, _, [{StartTime, EndTime, Days}]} ->
       {ok,  {StartTime, EndTime, Days}};
     {error, Reason} ->
-      throw({<<"db_error">>, tt_utils:val_to_binary(Reason)})
+      throw({?DB_ERROR_TYPE, tt_utils:val_to_binary(Reason)})
   end.
 
 add_exclusion(UserId, TypeExclusion, StartDateTime, EndDateTime) ->
@@ -120,7 +118,7 @@ add_exclusion(UserId, TypeExclusion, StartDateTime, EndDateTime) ->
   case make_request(Sql, [UserId, TypeExclusion, StartDateTime, EndDateTime]) of
     {ok, _} -> ok;
     {error, Reason} ->
-      throw({<<"db_error">>, tt_utils:val_to_binary(Reason)})
+      throw({?DB_ERROR_TYPE, tt_utils:val_to_binary(Reason)})
   end.
 
 get_exclusions(UserId) ->
@@ -129,7 +127,7 @@ get_exclusions(UserId) ->
     {ok, _, Exclusions} ->
       {ok, Exclusions};
     {error, Reason} ->
-      throw({<<"db_error">>, tt_utils:val_to_binary(Reason)})
+      throw({?DB_ERROR_TYPE, tt_utils:val_to_binary(Reason)})
   end.
 
 get_exclusions_by_period(UserId, StartDate, EndDate) ->
@@ -139,7 +137,7 @@ get_exclusions_by_period(UserId, StartDate, EndDate) ->
     {ok, _, Exclusions} ->
       {ok, Exclusions};
     {error, Reason} ->
-      throw({<<"db_error">>, tt_utils:val_to_binary(Reason)})
+      throw({?DB_ERROR_TYPE, tt_utils:val_to_binary(Reason)})
   end.
 
 get_history_by_user(UserId) ->
@@ -149,7 +147,7 @@ get_history_by_user(UserId) ->
       History = [TouchTime || {TouchTime} <- Rows],
       {ok, History};
     {error, Reason} ->
-      throw({<<"db_error">>, tt_utils:val_to_binary(Reason)})
+      throw({?DB_ERROR_TYPE, tt_utils:val_to_binary(Reason)})
   end.
 
 get_history_by_period(UserId, StartDate, EndDate) ->
@@ -159,24 +157,7 @@ get_history_by_period(UserId, StartDate, EndDate) ->
       History = [TouchTime || {TouchTime} <- Rows],
       {ok, History};
     {error, Reason} ->
-      throw({<<"db_error">>, tt_utils:val_to_binary(Reason)})
-  end.
-
-get_schedule_with_exclusions(UserId, StartDate, EndDate) ->
-  ScheduleSql = "SELECT start_time, end_time, days FROM work_schedules WHERE user_id = $1",
-  ExclusionsSql = "SELECT type_exclusion, start_datetime, end_datetime FROM schedule_exclusions WHERE user_id = $1 AND start_datetime <= $3::timestamp AND end_datetime >= $2::timestamp",
-  case make_request(ScheduleSql, [UserId]) of
-    {ok, _, [{StartTime, EndTime, Days}]} ->
-      case make_request(ExclusionsSql, [UserId, StartDate, EndDate]) of
-        {ok, _, Exclusions} ->
-          {ok, #{start_time => StartTime, end_time => EndTime, days => Days}, Exclusions};
-        {error, Reason} ->
-          throw({<<"db_error">>, tt_utils:val_to_binary(Reason)})
-      end;
-    {ok, _, []} ->
-      throw({<<"invalid_request">>, <<"No work schedule for user_id">>});
-    {error, Reason} ->
-      throw({<<"db_error">>, tt_utils:val_to_binary(Reason)})
+      throw({?DB_ERROR_TYPE, tt_utils:val_to_binary(Reason)})
   end.
 
 get_first_touch_date(UserId) ->
@@ -185,10 +166,9 @@ get_first_touch_date(UserId) ->
     {ok, _, [{FirstTouchDate}]} ->
       {ok, FirstTouchDate};
     {ok, _, []} ->
-      throw({<<"invalid_request">>, <<"No touch history for user_id = ", 
-        (integer_to_binary(UserId))/binary>>});
+      throw({?INVALID_REQUEST_TYPE, ?ERROR_NO_HISTORY_BY_USER_ID(UserId)});
     {error, Reason} ->
-      throw({<<"db_error">>, tt_utils:val_to_binary(Reason)})
+      throw({?DB_ERROR_TYPE, tt_utils:val_to_binary(Reason)})
   end.
 
 %%%===================================================================
