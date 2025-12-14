@@ -80,14 +80,9 @@ $ rebar3 shell
 
 ### RPC Client
 
-For testing the service, an RPC client module `tt_rpc_client.erl` has been added. This module sends requests through RabbitMQ to the `time_tracker_rpc` queue and receives responses. The client is used for all API method examples in this documentation.
+For testing the service, an RPC client module `tt_rpc_client.erl` has been added. This module sends requests through RabbitMQ to the `time_tracker_rpc` queue and receives responses.
 
-The client automatically handles:
-- JSON encoding/decoding of requests and responses
-- Connection management to RabbitMQ
-- RPC call/response pattern
-
-All API examples in this documentation use `tt_rpc_client:call/1` to interact with the service.
+All API examples use `tt_rpc_client:call/1` to interact with the service.
 
 ## API Methods
 
@@ -447,6 +442,26 @@ When an error occurs, the service returns a response in the following format:
 - An employee can register a card only twice per day (arrival and departure)
 - Attempting to register a card more than twice per day will throw an exception
 
+## Tests
+
+To run all tests:
+
+```bash
+$ rebar3 eunit
+```
+
+To run tests for a specific module:
+
+```bash
+$ rebar3 eunit --module=tt_utils_tests
+```
+
+To enable database tests, use the `test_db` profile:
+
+```bash
+$ rebar3 as test_db eunit
+```
+
 ## Project Structure
 
 ```
@@ -459,7 +474,7 @@ time_tracker/
 │   ├── handlers/        # Request handlers
 │   ├── mq/              # RabbitMQ modules
 │   ├── utils/           # Utilities
-│   └── validation/      # Data validation
+│   └── validation/        # Data validation
 └── rebar.config         # rebar3 configuration
 ```
 
