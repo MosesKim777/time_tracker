@@ -28,7 +28,12 @@ create_schema() ->
 
 drop_schema() ->
   {ok, Connection} = tt_db_worker:get_connection(),
-  drop_tables(Connection, ?TABLES).
+  case drop_tables(Connection, ?TABLES) of
+    ok ->
+      drop_function(Connection);
+    Error ->
+      Error
+  end.
 
 clear_all_tables() ->
   {ok, Connection} = tt_db_worker:get_connection(),
@@ -99,5 +104,16 @@ clear_tables(Connection, TableNames) ->
       ok;
     {error, Reason} ->
       {error, {truncate_error, Reason}}
+  end.
+
+drop_function(Connection) ->
+  Sql = "DROP FUNCTION IF EXISTS check_work_history_limit() CASCADE",
+  case epgsql:squery(Connection, Sql) of
+    {ok, _, _} ->
+      ok;
+    {ok, _} ->
+      ok;
+    {error, Reason} ->
+      {error, {drop_function_error, Reason}}
   end.
 
