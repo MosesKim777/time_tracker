@@ -7,6 +7,13 @@
   clear_all_tables/0
 ]).
 
+-define(TABLES, [
+  "cards",
+  "work_schedules",
+  "schedule_exclusions",
+  "work_history"
+]).
+
 %%%===================================================================
 %%% API
 %%%===================================================================
@@ -20,14 +27,12 @@ create_schema() ->
   end.
 
 drop_schema() ->
-  Tables = [cards, work_schedules, schedule_exclusions, work_history],
   {ok, Connection} = tt_db_worker:get_connection(),
-  drop_tables(Connection, Tables).
+  drop_tables(Connection, ?TABLES).
 
 clear_all_tables() ->
-  Tables = [cards, work_schedules, schedule_exclusions, work_history],
   {ok, Connection} = tt_db_worker:get_connection(),
-  clear_tables(Connection, Tables).
+  clear_tables(Connection, ?TABLES).
 
 %%%===================================================================
 %%% Internal functions
@@ -71,8 +76,7 @@ check_results([_ | Rest]) ->
 
 drop_tables(_Connection, []) ->
   ok;
-drop_tables(Connection, [Table | Rest]) ->
-  TableName = atom_to_list(Table),
+drop_tables(Connection, [TableName | Rest]) ->
   Sql = "DROP TABLE IF EXISTS " ++ TableName ++ " CASCADE",
   case epgsql:squery(Connection, Sql) of
     {ok, _, _} ->
@@ -80,13 +84,12 @@ drop_tables(Connection, [Table | Rest]) ->
     {ok, _} ->
       drop_tables(Connection, Rest);
     {error, Reason} ->
-      {error, {drop_table_error, Table, Reason}}
+      {error, {drop_table_error, TableName, Reason}}
   end.
 
 clear_tables(_Connection, []) ->
   ok;
-clear_tables(Connection, Tables) ->
-  TableNames = [atom_to_list(Table) || Table <- Tables],
+clear_tables(Connection, TableNames) ->
   TableList = string:join(TableNames, ", "),
   Sql = "TRUNCATE TABLE " ++ TableList ++ " RESTART IDENTITY CASCADE",
   case epgsql:squery(Connection, Sql) of
