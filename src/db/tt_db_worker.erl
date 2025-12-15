@@ -73,7 +73,7 @@ connect_to_db() ->
   Port = proplists:get_value(port, Config, 5432),
   Username = proplists:get_value(username, Config, "postgres"),
   Password = proplists:get_value(password, Config, "postgres"),
-  Database = proplists:get_value(database, Config, "time_tracker"),
+  Database = proplists:get_value(database, Config, "postgres"),
 
   epgsql:connect(Host, Username, Password, [
     {database, Database},

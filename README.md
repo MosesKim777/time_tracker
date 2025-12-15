@@ -45,7 +45,7 @@ Configure database and RabbitMQ connections in the `config/sys.config` file:
       {port, 5432},
       {username, "postgres"},
       {password, "postgres"},
-      {database, "time_tracker"}
+      {database, "postgres"}
     ]},
     {rabbitmq, [
       {host, "localhost"},
